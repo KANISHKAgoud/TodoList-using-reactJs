@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 // import './App.css'
@@ -8,40 +8,58 @@ function App() {
   const [todo, settodo] = useState("")
   const [alltodos, setAlltodos] = useState([])
   const [Editindex, setEditindex] = useState(null)
-  
+
+  useEffect(() => {
+    let todosinlocalstorage = localStorage.getItem("alltodos")
+    if (todosinlocalstorage) {
+      let fromlocalstoragetodos = JSON.parse(localStorage.getItem("alltodos"))
+      setAlltodos(fromlocalstoragetodos)
+    }
+  }, [])
+
+
+  let savetodos = () => {
+    localStorage.setItem("alltodos", JSON.stringify(alltodos))
+  }
+
+
   let handleChange = (e) => {
     settodo(e.target.value)
+    savetodos()
   }
 
   let handledelete = (index) => {
     setAlltodos(alltodos.filter((_, i) =>
       i !== index
     ))
+    savetodos()
   }
   let handleedit = (index) => {
     settodo(alltodos[index])
     setEditindex(index)
+    savetodos()
   }
 
   let handletoggle = (index) => {
     let updated = [...alltodos]
-      updated[index].completed = !updated[index].completed
-      setAlltodos(updated)
+    updated[index].completed = !updated[index].completed
+    setAlltodos(updated)
+    savetodos()
   }
 
 
   let handleadd = () => {
     let updated = [...alltodos]
     if (Editindex === null) {
-      updated.push({text:todo, completed:false})
+      updated.push({ text: todo, completed: false })
     }
     else {
-      updated[Editindex] = {text:todo}
+      updated[Editindex] = { text: todo }
     }
     setAlltodos(updated)
     setEditindex(null)
     settodo("")
-
+    savetodos()
   }
 
 
@@ -56,7 +74,7 @@ function App() {
             <div className='flex'>
 
               <input className='rounded-2xl w-3/4 sm:w-4/6 mr-4' type="text" value={todo} onChange={handleChange} />
-              <button className='bg-green-600 h-10 w-16 sm:w-24 rounded-md cursor-pointer hover:bg-green-800' onClick={handleadd}>
+              <button disabled={todo.length<2} className='bg-green-600 h-10 w-16 sm:w-24 rounded-md cursor-pointer hover:bg-green-800' onClick={handleadd}>
                 {Editindex === null ? "ADD" : "UPDATE"}
               </button>
             </div>
@@ -68,10 +86,10 @@ function App() {
               <div className='' onClick={() => {
                 handletoggle(index)
               }}>
-                {e.completed ? (<i className="fa-solid fa-circle-check"></i>): (<i className="fa-regular fa-circle"></i>)}
-                </div>
-              <div style={{textDecoration: e.completed ? "line-through": "none"}} className=' w-1/4 rounded-lg h-8 pl-3'>
-              {e.text}
+                {e.completed ? (<i className="fa-solid fa-circle-check"></i>) : (<i className="fa-regular fa-circle"></i>)}
+              </div>
+              <div style={{ textDecoration: e.completed ? "line-through" : "none" }} className=' w-1/4 rounded-lg h-8 pl-3'>
+                {e.text}
               </div>
               <div className='absolute flex gap-x-9 right-4'>
                 <button className='' onClick={() => handleedit(index)}>
