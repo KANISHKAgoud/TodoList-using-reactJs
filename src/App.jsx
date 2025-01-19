@@ -6,26 +6,40 @@ import Navbar from './components/navbar'
 
 function App() {
   // const [count, setCount] = useState(0)
-  const [todo_data, settodo_data] = useState("")
+  const [todo, settodo] = useState("")
   const [alltodos, setAlltodos] = useState([])
+  const [Editindex, setEditindex] = useState(null)
 
-  const handleChange = (e) => {
-    settodo_data (e.target.value)
-    console.log(alltodos)
+  let handleChange = (e) => {
+    settodo(e.target.value)
   }
 
-  const handledelete = () => {
-    
+  let handledelete = (index) => {
+    setAlltodos(alltodos.filter((e,i) => {
+      i !== index
+    }))
   }
-  const handleedit = () => {
-    
+  let handleedit = (index) => {
+    settodo(alltodos[index])
+    setEditindex(index)
   }
-  const handleadd = () => {
-    setAlltodos ([...alltodos, {todo, iscompleted : false }])
-    settodo_data ("")
+
+  let handleadd = () => {
+    let updated = [...alltodos]
+    if (Editindex === null)
+    {
+    updated.push(todo)
+    }
+    else{
+      updated[Editindex] = todo
+    }
+    setAlltodos(updated)
+    setEditindex(null)
+    settodo("")
+
   }
-  
-  
+
+
 
   return (
     <>
@@ -34,17 +48,29 @@ function App() {
         <div className='bg-green-100 w-3/4 mx-auto my-4 p-4 rounded-xl'>
           <div className='flex gap-x-8 font-bold text-xl justify-center'>
             <li className='list-none'>Add todo</li>
-            <input className='rounded-2xl' type="text" value={todo_data} onChange={handleChange}/>
-            <button className='bg-green-600 h-10 w-24 rounded-md cursor-pointer hover:bg-green-800' onClick={handleadd}>ADD</button>
+            <input className='rounded-2xl' type="text" value={todo} onChange={handleChange} />
+            <button className='bg-green-600 h-10 w-24 rounded-md cursor-pointer hover:bg-green-800' onClick={handleadd}>
+              {Editindex === null ? "ADD" : "UPDATE"}
+            </button>
           </div>
           <div className='font-bold text-2xl'>Your Todos</div>
 
-          <div className='text-lg flex gap-x-7 my-8'>
-            
-            <div className='w-1/4 bg-green-50 rounded-lg h-8 pl-3'>content</div>
-            <button onClick={handleedit}><i class="fa-solid fa-pen-to-square"></i></button>
-            <button onClick={handledelete}><i class="fa-solid fa-trash-can"></i></button>
-          </div>
+          {alltodos.map((e,index) => {
+            return (<div key={index} className='relative text-lg bg-green-50 flex gap-x-7 my-8'>
+
+              <div className=' w-1/4 rounded-lg h-8 pl-3'>{e}</div>
+              <div className='absolute flex gap-x-9 right-4'>
+              <button className='' onClick={() => handleedit(index)}>
+                <i className="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button className='' onClick={() => handledelete(index)}>
+                <i className="fa-solid fa-trash-can"></i>
+              </button>
+              </div>
+            </div>
+            )
+          })}
+
         </div>
       </div>
     </>
